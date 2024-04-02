@@ -106,7 +106,7 @@ jobs:
         timeout-minutes: 5
         run: |
           while ! docker logs exist-ci | grep -q "Server has started"; \
-          do sleep 2s; \
+          do sleep 10s; \
           done 
 
       - name: Run tests
