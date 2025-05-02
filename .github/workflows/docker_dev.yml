@@ -1,8 +1,8 @@
 name: Docker Dev containers for HSG
-on: 
+on:
   push:
   pull_request:
-  # schedule: 
+  # schedule:
   #     - cron: "0 0/12 * * *"
 
 env:
@@ -16,29 +16,34 @@ jobs:
     # NOTE (DP): Test on PRs and pushes
     if: github.ref == 'refs/heads/main' || github.base_ref ==  'main'
     steps:
-    
-    # SETUP
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          build-mount-path: /var/lib/docker/
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
+      # SETUP
+      # - name: Maximize build space
+      #   uses: easimon/maximize-build-space@master
+      #   with:
+      #     build-mount-path: /var/lib/docker/
+      #     remove-dotnet: 'true'
+      #     remove-android: 'true'
+      #     remove-haskell: 'true'
+      #     remove-codeql: 'true'
+      #     remove-docker-images: 'true'
 
-      - name: Restart docker
-        run: sudo service docker restart
+      # - name: Restart docker
+      #   run: sudo service docker restart
 
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
+      - name: test secret masking
+        run: echo ${{ secrets.FAKE_SECRET }}
+
+      - name: just dump secret
+        run: echo "secret1234"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: linux/amd64,linux/arm64 
+          platforms: linux/amd64,linux/arm64
           # platforms: all
 
       - name: Login to Docker Hub
@@ -61,7 +66,7 @@ jobs:
         run: |
           df -h /var/lib/docker
           df -ih /var/lib/docker
-      
+
       - name: Check config
         run: docker info
 
@@ -101,17 +106,17 @@ jobs:
       - name: Start exist-ci containers
         run: |
           docker run -dit -p 8080:8080 --health-interval 4s --name exist-ci ${{ env.TEST_TAG }}
-      
+
       - name: wait for boot to finish
         timeout-minutes: 5
         run: |
           while ! docker logs exist-ci | grep -q "Server has started"; \
           do sleep 10s; \
-          done 
+          done
 
       - name: Run tests
         run: bats --tap test/*.bats
-      
+
       - name: stop test machine
         run: docker stop exist-ci
 
