@@ -74,7 +74,7 @@ jobs:
       # see https://github.com/felipecrs/docker-images/commit/f74a9532da6549d9562574eb1709ef50cedb640c
       - name: Build amd image for testing on CI
         timeout-minutes: 40
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64
@@ -89,7 +89,7 @@ jobs:
 
       - name: Build arm image to populate cache
         timeout-minutes: 180
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/arm64
@@ -124,7 +124,7 @@ jobs:
       # Release
       - name: Push :latest to Dockerhub
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./
           platforms: linux/amd64,linux/arm64
